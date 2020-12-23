@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import ImageGallery from "../ImageGallery/ImageGallery";
-import axios from "axios";
-
+import APIservice from "../../services/API";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Loader from "react-loader-spinner";
 import propTypes from "prop-types";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Status = {
   IDLE: "idle",
@@ -13,51 +13,44 @@ const Status = {
   REJECTED: "rejected",
 };
 
-export default function ImageInfo({ resetPage, request, page, addPage }) {
-  const [images, setImages] = useState([]);
+export default function ImageInfo({
+  request,
+  page,
+  setNextPage,
+  images,
+  setImages,
+}) {
   const [error, setError] = useState(null);
   const [status, setStatus] = useState(Status.IDLE);
 
-  useEffect(
-    (prevState) => {
-      if (!request) {
-        return;
-      }
-      setStatus(Status.PENDING);
-      fetchFromAPI();
-      resetPage();
-    },
-    [request, page]
-  );
-
-  useEffect(() => {
-    scrollPage();
-  }, [images]);
-
-  function scrollPage() {
+  const scrollPage = () => {
     window.scrollTo({
       top: document.documentElement.scrollHeight,
       behavior: "smooth",
     });
-  }
+  };
 
-  function fetchFromAPI() {
-    const key = "18616543-61f088c3928fc4bac834774e6";
-    const url = `https://pixabay.com/api/?q=${request}&page=${page}&key=${key}&image_type=photo&orientation=horizontal&per_page=12`;
-    axios
-      .get(url)
+  useEffect(() => {
+    if (!request) {
+      return;
+    }
+
+    setStatus(Status.PENDING);
+    APIservice.getImages(request, page)
       .then((images) => {
-        if (page > 1) {
-          setImages((prevState) => [...prevState, ...images.data.hits]);
-        }
+        setImages((prevState) => [...prevState, ...images]);
 
-        if (page === 1) {
-          setImages(images.data.hits);
+        if (images) {
+          setStatus(Status.RESOLVED);
+          if (page > 1) {
+            scrollPage();
+          }
+          return;
         }
-        setStatus(Status.RESOLVED);
+        setStatus(Status.REJECTED);
       })
-      .catch((error) => setError(Status.REJECTED));
-  }
+      .catch((error) => setError(error));
+  }, [request, page, setImages]);
 
   if (status === "idle") {
     return null;
@@ -79,17 +72,17 @@ export default function ImageInfo({ resetPage, request, page, addPage }) {
   }
 
   if (status === "rejected") {
-    return <div>{error}</div>;
+    toast.error(error);
+    return;
   }
 
   if (status === "resolved") {
-    return <ImageGallery images={images} addPage={addPage} />;
+    return null;
   }
 }
 
 ImageInfo.propTypes = {
-  addPage: propTypes.func.isRequired,
-  resetPage: propTypes.func.isRequired,
+  setNextPage: propTypes.func.isRequired,
   page: propTypes.number.isRequired,
   request: propTypes.string.isRequired,
 };

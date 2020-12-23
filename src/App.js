@@ -3,6 +3,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Searchbar from "./components/Searchbar/Searchbar";
 import ImagesInfo from "./components/ImagesInfo/ImagesInfo";
+import ImageGallery from "./components/ImageGallery/ImageGallery";
 import Modal from "./components/Modal/Modal";
 
 export default function App() {
@@ -10,30 +11,34 @@ export default function App() {
   const [picture, setPicture] = useState("");
   const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [images, setImages] = useState([]);
 
-  function handleFormSubmit(request) {
+  const handleFormSubmit = (request) => {
+    setImages([]);
+    setPage(1);
     setRequest(request);
-  }
+  };
 
-  function choosePicture(e) {
+  const choosePicture = (e) => {
     if (e.target.nodeName !== "IMG") {
       return;
     }
     setPicture(e.target.currentSrc);
     toogleModal();
-  }
+  };
 
-  function toogleModal() {
+  const toogleModal = () => {
     setShowModal((showModal) => !showModal);
-  }
+  };
 
-  function addPage() {
+  const setNextPage = () => {
+    console.log("setNExtPage worked");
     setPage((prevState) => prevState + 1);
-  }
+  };
 
-  function resetPage() {
+  const resetPage = () => {
     setPage(1);
-  }
+  };
 
   return (
     <div onClick={choosePicture} className="App">
@@ -42,9 +47,14 @@ export default function App() {
       <ImagesInfo
         request={request}
         page={page}
-        addPage={addPage}
+        setNextPage={setNextPage}
         resetPage={resetPage}
+        images={images}
+        setImages={setImages}
       />
+      {images.length > 0 && (
+        <ImageGallery images={images} setNextPage={setNextPage} />
+      )}
       <ToastContainer autoClose={3000} />
     </div>
   );

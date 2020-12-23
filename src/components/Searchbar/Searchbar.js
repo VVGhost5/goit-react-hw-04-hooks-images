@@ -4,21 +4,21 @@ import { toast } from "react-toastify";
 import propTypes from "prop-types";
 
 export default function Searchbar({ onSubmit }) {
-  const [request, setRequest] = useState("");
+  const [query, setQuery] = useState("");
 
-  function handleRequestChange(event) {
-    setRequest(event.currentTarget.value.toLowerCase());
+  function handleQueryChange(event) {
+    setQuery(event.currentTarget.value.toLowerCase());
   }
 
   function handleSubmit(event) {
     event.preventDefault();
 
-    if (request.trim() === "") {
+    if (!query.trim()) {
       toast.error("Enter your request");
       return;
     }
-    onSubmit(request);
-    setRequest("");
+    onSubmit(query);
+    setQuery("");
   }
   return (
     <header className={styles.searchbar}>
@@ -34,8 +34,8 @@ export default function Searchbar({ onSubmit }) {
           autoComplete="off"
           autoFocus
           placeholder="Search images and photos"
-          value={request}
-          onChange={handleRequestChange}
+          value={query}
+          onChange={handleQueryChange}
         />
       </form>
     </header>

@@ -1,9 +1,9 @@
 import styles from "./ImageGallery.module.css";
-import ImageGalleryItem from "../ImageGalleryItem/ImageGalleryItem";
+import ImageGalleryItem from "./ImageGalleryItem";
 import ButtonLoadMore from "../ButtonLoadMore/ButtonLoadMore";
 import propTypes from "prop-types";
 
-const ImageGallery = ({ images, addPage }) => {
+const ImageGallery = ({ images, setNextPage }) => {
   return (
     <div>
       <ul className={styles.ImageGallery}>
@@ -11,13 +11,13 @@ const ImageGallery = ({ images, addPage }) => {
           <ImageGalleryItem key={img.id} imageData={img}></ImageGalleryItem>
         ))}
       </ul>
-      <ButtonLoadMore addPage={addPage}></ButtonLoadMore>
+      <ButtonLoadMore setNextPage={setNextPage}></ButtonLoadMore>
     </div>
   );
 };
 
 ImageGallery.propTypes = {
-  addPage: propTypes.func.isRequired,
+  setNextPage: propTypes.func.isRequired,
   images: propTypes.arrayOf(propTypes.object.isRequired),
 };
 
